@@ -1,0 +1,401 @@
+<html>
+<head>
+<link href="css/projects.css" rel="stylesheet" type="text/css">
+<title>Pig</title>
+</head>
+
+<body>
+<h2>Project 1: The Game of Pig</h2>
+
+<blockquote style="text-align:center;">
+  <div class="c1"><img src="5.png"></div>
+
+  <p><cite>I know! I'll use my<br>
+  Higher-order functions to<br>
+  Order higher rolls.</cite></p>
+</blockquote>
+
+<h3>Introduction</h3>
+
+<p>In this project, you will develop a simulator and strategy function for the game of
+Pig. You will need to implement some higher-order functions, experiment with random
+number generators, and generate some ASCII art. This project uses ideas from
+Chapter 1 of the lecture notes.</p>
+
+<p>Pig is a dice game with simple rules: Two players race to reach 100 total points.
+Each turn, a player repeatedly <i>rolls</i> a die until either a 1 ("pig") is rolled or
+the player <i>holds</i> and scores the sum of the rolls.  The sum of the rolls
+on a turn is called the <i>turn total</i>. At any time during a player's turn,
+the player is faced with two decisions:</p>
+
+<ul>
+  <li>
+    <p><b>roll</b> - If the player rolls a</p>
+
+    <ul>
+      <li>
+        <p>1: the player scores 1 point and it becomes the opponent's
+        turn.</p>
+      </li>
+
+      <li>
+        <p>anything else: the roll is added to the player's turn total, and
+        the turn continues.</p>
+      </li>
+    </ul>
+  </li>
+
+  <li>
+    <p><b>hold</b> - The player scores the turn total and it becomes the opponent's
+    turn.</p>
+  </li>
+</ul>
+
+<p>Someone has posted a <a href="http://www.youtube.com/watch?v=gVIvB-ahI4A">Pig
+instructional video</a>.  Our rules differ somewhat from those in the video:
+they give 0 points to a turn that ends in a
+roll of 1, while we give 1 point.  
+
+<p>In this project, you will create a variant of Pig that uses two different
+dice.  Players roll a 6-sided die, unless the <i>sum of the scores</i> of both
+players is a multiple of 7 (0 included), in which case they roll a 4-sided die.
+This sum of scores <i>does not</i> include the turn total.</p>
+
+<p>This project includes three files, but all of your changes will be made to the first
+one. You can download all of the project code as a <a href="pig.zip">zip
+archive</a>.</p>
+
+<table cellpadding="10" cellspacing="2">
+  <tr>
+    <td>
+      <p><code><a href="pig.py.html">pig.py</a></code></p>
+    </td>
+
+    <td>
+      <p>A starter implementation of Pig.</p>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <p><code><a href="dice.py.html">dice.py</a></code></p>
+    </td>
+
+    <td>
+      <p>Functions for rolling dice.</p>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <p><code><a href="ucb.py.html">ucb.py</a></code></p>
+    </td>
+
+    <td>
+      <p>Utility functions for 61A.</p>
+    </td>
+  </tr>
+</table>
+
+<h3>Logistics</h3>
+
+<p>This is a two-week project.
+Start early! The amount of time it takes to complete a project (or any
+program) is unpredictable. Ask for help early and often -- the TAs and lab
+assistants are here to help.</p>
+
+<p> The project is worth 15 points.  To avoid fractions, however, we
+have assigned "inflated" points that add up to 25.  We'll simply
+weight the grading calculation by multiplying the nominal score you
+receive by 0.6.
+
+<p>The only file that you are required to submit is the file called "pig.py".
+You do not need to modify any other files in order to complete the project. To
+submit the project, change to the directory where the pig.py file is located and
+run <code>submit proj1</code>. We will set up an autograder that runs your
+code through different test cases and sends out the results in an email.<p>
+
+<h3>Phase 1</h3>
+
+<p>In the first week, you will develop a simulator for the game and a basic strategy.
+The first step in implementing a Pig simulator is to specify the rules of the game.
+You will implement two of the legal actions: <code>roll</code> and
+<code>hold</code>. A turn consists of a
+sequence of actions and ends either when a player rolls a 1 or holds.
+Read the comments
+of the functions you are implementing, as they specify the precise behavior
+expected.</p>
+
+<p><b>Problem A1</b> (1 pt). Implement the <code>roll</code> function in
+<code><a href="pig.py.html">pig.py</a></code>, which computes the result of rolling a particular outcome.
+No points are scored unless the turn ends! On successful (greater than 1)
+rolls, points are only accumulated in the turn total.</p>
+
+<p>Verify your work by checking that the doctest for <code>roll</code> passes when you
+run</p>
+<pre>
+python3 -m doctest pig.py
+</pre>
+
+<p><b>Problem B1</b> (1 pt). Implement the <code>hold</code> function in
+<code><a href="pig.py.html">pig.py</a></code>, which computes the result of holding. Holding actually doesn't
+care about the dice outcome. Nonetheless, this argument is provided so that
+<code>hold</code> has the same signature as <code>roll</code>. Similarly,
+<code>hold</code> must return a turn total even though the result is irrelevant
+to the game. Always return a turn total of 0.</p>
+
+<p>Verify your work by checking that the doctest for <code>hold</code> passes when you
+run</p>
+<pre>
+python3 -m doctest pig.py
+</pre>
+
+<p><b>Problem 2</b> (2 pt). Implement the <code>take_turn</code> function, which
+simulates a complete turn that may include multiple rolls. This function takes a
+<code>plan</code> argument, which itself is a function (see next paragraph). The
+return value of <code>take_turn</code> is the total number of points the player
+scored during that turn.
+
+<p>A <i>plan</i> is a function that takes one integer argument, the current
+<code>turn_total</code>, and returns one of the two legal actions: either
+<code>roll</code> or <code>hold</code> that you just implemented. A plan
+represents a player's decision of whether to roll or hold.  It does not consider
+the total score for either player; only the current turn total.</p>
+
+<p>A <i>dice</i> is also a function (we would call it a "die", but that's too
+morbid).  It takes no arguments and returns an integer: the outcome of a die
+roll.
+
+<p><i>Important:</i> Your implementation of <code>take_turn</code> should call
+the <code>dice</code> function <i>exactly once</i> for every action, including
+<code>hold</code>. If you don't do this, various tests will break later in the
+project!</p>
+
+<p>For now, you can ignore the arguments <code>who</code>, and
+<code>comments</code>, which you will use later.</p>
+
+<p>The <code>run</code> function at the bottom of <code><a href="pig.py.html">pig.py</a></code> is currently set
+up to call <code>take_turn</code> (via <code>take_turn_test</code>) and print the
+result. Hence, you can experiment with your implementation simply by running</p>
+<pre>
+python3 pig.py
+</pre>
+
+<p>The plan that is provided by default will <code>roll</code> until the turn
+total reaches at least 10, and then <code>hold</code>.</p>
+
+<p><i>Hint:</i> We have provided some tools in <code><a href="ucb.py.html">ucb.py</a></code> to help you
+understand what is happening in your code. If you decorate a function with
+<code>@trace</code>, then a line of output will be printed every time that function is
+called. If you call <code>log_current_line()</code>, then the current line number will
+be printed. Finally, if you call <code>interact()</code>, then you will receive an
+interactive prompt in the current environment.</p>
+
+<p><b>Problem 3</b> (1 pt). Implement a better <code>take_turn_test</code>, which
+validates the correctness of your <code>take_turn</code> implementation. To do so, read
+the <code><a href="dice.py.html">dice.py</a></code> file, which provides a function called
+<code>make_test_die</code>. Test dice are not random like regular dice. Instead, you
+can specify the exact sequence of outcomes returned by successive rolls. The docstring
+for <code>make_test_die</code> shows examples.</p>
+
+<p>Using <code>assert</code> statements, test that the default plan scores exactly 10
+points when rolling a 4, 6, 1. Add additional tests to ensure that the plan gives
+expected outcomes with various roll sequences.</p>
+
+<p><b>Problem 4</b> (1 pt). Change the default value for <code>comments</code> in
+<code>take_turn</code> from <code>False</code> to <code>True</code>. Then, call
+<code>commentate</code> after the result of each action is computed, whenever
+<code>comment</code> is <code>True</code>. You will need to read the docstring
+for <code>commentate</code> to make this call correctly.</p>
+
+<p>After you start calling the <code>commentate</code> function, you should see a
+transcript of events when you run <code><a href="pig.py.html">pig.py</a></code> that includes statements like,
+"Someone did something... Someone now has a turn total of 7 points." Details of
+the game events are currently rather vague.</p>
+
+<p><b>Problem A5</b> (2 pt). Now  implement
+<code>describe_action</code>, which takes an action function and returns a
+string describing that action. Edit the body of <code>describe_action</code> so
+that its doctest passes.  For any action that is not <code>roll</code> or
+<code>hold</code>, the commentator should announce that an illegal action was
+taken.</p> 
+
+<p>When you are finished, the doctest for <code>describe_action</code> should pass, and
+your commentary should have informative action messages when you run
+<code>take_turn</code> with <code>comments</code> equal to <code>True</code>.</p>
+
+<p><i>Hint:</i> You can figure out what a function is without calling it, using
+<code>==</code>.
+
+<p><b>Problem B5</b> (2 pt). Implement <code>draw_number</code>,
+which draws the outcome of a die using text symbols. Such pictures are called
+ASCII art.</p>
+
+<p>The drawing facility is actually written for you in <code>draw_die</code>. However,
+it uses a bunch of Python syntax that we haven't yet covered! You'll have to use this
+function as a black box, just by reading its docstring. Programming often involves
+using other people's code by reading the documentation.</p>
+
+<p>When you are finished, the doctest for <code>draw_number</code> should pass, and
+your commentary should produce ASCII dice pictures when you call
+<code>take_turn</code> with <code>comments</code> equal to
+<code>True</code>.</p>
+
+<p>You're almost ready to implement a full game of Pig!
+
+<p><b>Problem 6</b> (1 pt). First, implement <code>make_roll_until_strategy</code>.
+This is a function that returns a <i>strategy</i>. Strategies are functions that return
+plans. Plans are functions that return actions. Actions are functions too.
+Yikes! This project just got complicated. Fortunately, our functional
+abstractions will alleviate us from ever having to write quadruple-nested
+<code>def</code> statements. In fact, this question requires very little code,
+but lots of description.</p>
+
+<p><i>Plans:</i> A plan is a function that takes one integer argument,
+the current <code>turn_total</code>, and returns an action (<code>hold</code> or
+<code>roll</code>). We have already been using plans to test
+<code>take_turn</code>. In <code>take_turn_test</code>, we created a plan using
+the <code>make_roll_until_plan</code> function, which takes a
+<code>turn_goal</code> and returns a plan to roll until that goal is met. Go
+read the implementation of <code>make_roll_until_plan</code>. Your strategy
+functions will use it.</p>
+
+<p><i>Strategies:</i> A strategy is a function that takes two arguments: the player's
+score and the opponent's score. It returns a plan. A strategy is used to pick a plan
+each turn, based on the players' current scores in the game.</p>
+
+<p> <code>make_roll_until_strategy</code> itself is not the strategy, but a
+function that returns a strategy.</p>
+
+<p>Your implementation of <code>make_roll_until_strategy</code> should return a
+<i>very</i> simple strategy: one that always returns the same plan regardless of
+its two arguments. The plan it returns always chooses to roll unless the
+specified turn_total goal has been reached.</p>
+
+<p>Call <code>make_roll_until_strategy_test</code> to verify your work.</p>
+
+<p><b>Problem 7</b> (3 pt). Finally, implement the <code>play</code> function, which
+simulates a full game of pig. Players alternate turns, each using the plan returned by
+their own strategy function, until one of the players reaches the goal score. When the
+game ends, <code>play</code> should return 0 if the first player wins and 1
+otherwise.</p>
+
+<p>Remember that you must supply the correct die to the <code>take_turn</code>
+function, according to the rules stated at the beginning of the project. As you work,
+remember to add <code>print</code> statements and use <code>@trace</code> to see what
+is happening in your code.</p>
+
+<p>To test your implementation, follow the instructions in the <code>run</code>
+function at the bottom of the project to play an interactive game.</p>
+
+<p>Congratulations! You've finished phase 1 of this project!</p>
+
+<h3>Phase 2</h3>
+
+<p>In the second week, you will experiment with ways to improve upon the basic
+strategy. In order to do this, you will first implement a small framework for testing
+strategy functions against the roll-until strategy. We will use the strategy returned
+by <code>make_roll_until_strategy(20)</code> as a baseline upon which we hope to
+improve.</p>
+
+<i>Note:</i> You will want to set the default of <code>comment</code> back to
+<code>False</code> in the definition of <code>take_turn</code>, so that you're
+not overwhelmed with output.
+
+<p><b>Problem 8</b> (1 pt). Implement the <code>average_value</code> function. This
+function takes two arguments, a non-pure target function <code>fn</code> and an integer
+<code>num_samples</code> that indicates how many times the target function should be
+called. The return value of the target function should be a number. Call
+<code>fn</code> repeatedly, <code>num_sample</code> times, and return the average
+result. Assume that <code>fn</code> takes no arguments. Make sure that the doctest
+passes before you move on.</p>
+
+<p><b>Problem 9</b> (2 pt). Implement the <code>averaged</code> function. This
+higher-order function takes a function <code>fn</code> as argument, and creates another
+function that takes the same number of arguments as the original. It is different from
+the original in that it returns the average value of repeatedly calling <code>fn</code>
+on its arguments.</p>
+
+<p>To implement this function, you need a new piece of Python syntax! You must write a
+function that accepts an arbitrary number of arguments, then calls another function
+using exactly those arguments. Here's how it works.</p>
+
+<p>Instead of listing formal parameters for a function, we write <code>*args</code>. To
+call another function using exactly those arguments, we call it again with
+<code>*args</code>. <code>args</code> is actually just another name in the
+environment, but changing that name is unconventional. For example,</p>
+<pre >
+&gt;&gt;&gt; def printed(fn):
+      def print_and_return(*args):
+          result = fn(*args)
+          print('Result:', result)
+          return result
+      return print_and_return
+
+&gt;&gt;&gt; printed_pow = printed(pow)
+&gt;&gt;&gt; printed_pow(2, 8)
+Result: 256
+256
+</pre>
+
+<p>Read the docstring for <code>averaged</code> carefully to understand how it is meant
+to work. Your implementation can use the <code>average_value</code> function you
+already implemented, but this is not required.</p>
+
+<p><b>Problem 10</b> (2 pt). This problem is about understanding code. Read
+<code>compare_strategies</code> and <code>eval_strategy_range</code>.
+Then, in <code>run_strategy_experiments</code>, use
+<code>eval_strategy_range</code> to evaluate different roll-until strategies, for
+<code>turn_goal</code> values from 15 to 25 inclusive. Print out what
+<code>eval_strategy_range</code> determined was the best value.</p>
+
+<p>Now you will implement three strategies that improve upon the baseline. 
+Some of the experiments may take up to a minute to
+run. You can always reduce the number of random samples in <code>averaged</code>
+to speed up experiments.</p>
+
+<p><b>Problem 11A</b> (2 pt). Implement the <code>make_die_specific_strategy</code>
+function. This function takes two turn goals, <code>four_side_goal</code> and
+<code>six_side_goal</code>, and returns a new strategy that checks to see which die is
+being used (either 4-sided or 6-sided) and returns a roll-until plan that stops at
+the corresponding turn goal. Keep in mind that a four-sided die is only used when the
+sum of your score and your opponent's score is divisible by 7. The idea here is that
+holding early with a 4-sided die avoids 1's.</p>
+
+<p>Add an experiment to <code>run_strategy_experiments</code> that evaluates different
+turn goals for a 4-sided die, in the range 5 to 15.</p>
+
+<p><b>Problem 11B</b> (2 pt). Implement the <code>make_pride_strategy</code>, which
+only stops rolling when two conditions are true: the turn total is at least
+<code>turn_goal</code> and the player's score after holding is at least
+<code>margin</code> greater than the opponent. The idea here is that riskier rolling is
+justified when a player is behind.</p>
+
+<p>Add an experiment to <code>run_strategy_experiments</code> that evaluates different
+margins for your new strategy, in the range 0 to 10.</p>
+
+<p><b>Problem 12</b> (2 pt). Implement <code>final_strategy</code>, which combines
+these ideas and others to achieve a win rate of at least 0.60 against the baseline
+roll-until-20 strategy. Here are some hints:</p>
+
+<ul>
+  <li>Think about what happens when you only need 10 more points to win, but are using
+  a roll-until-20 strategy. Can you improve end-game performance?</li>
+
+  <li>Roll-until-20 is a very bad idea when given a 4-sided die. Can you give your
+  opponent more bad dice?</li>
+</ul>
+
+<p>You're implementing a strategy function directly here, as opposed to a function that
+returns a strategy. If your win rate is usually (i.e., half the time) above 0.60, you
+have answered the question successfully.</p>
+
+<p>Congratulations, you've reached the end of your first CS61A project!</p>
+
+<p><b>Acknowledgements:</b>Richard Lan and John DeNero developd this project.
+The suggestion of using Pig as a CS project and the dice image came from <a
+  href="http://cs.gettysburg.edu/~tneller/index.html">Todd
+  Neller</a>.</p>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>dice.py</title>
+</head>
+
+<body>
+<h3>dice.py (<a href="dice.py">plain text</a>)</h3>
+<hr>
+<pre>
+<span style="color: darkred">"""Functions that simulate dice rolls
+
+A die is a function that takes no arguments and returns a number from 1 to n
+(inclusive), where n is the number of sides on the die.
+
+Types of dice:
+
+    Dice can be fair, meaning that they produce each possible outcome with equal
+    probability.  
+
+    For testing functions that use dice, this file also defines a deterministic
+    die, which always cycles among a fixed set of values when it is rolled.
+
+All functions defined in this module are higher-order functions that return dice.  
+"""
+
+</span><span style="color: blue; font-weight: bold">from </span>random <span style="color: blue; font-weight: bold">import </span>randint
+
+<span style="color: blue; font-weight: bold">def </span>make_fair_die<span style="font-weight: bold">(</span>sides<span style="font-weight: bold">=</span><span style="color: red">6</span><span style="font-weight: bold">):
+    </span><span style="color: darkred">"""Return a die that returns an outcome from 1 to sides with equal chance.
+
+    &gt;&gt;&gt; die = make_fair_die(1)
+    &gt;&gt;&gt; die()
+    1
+    """
+    </span><span style="color: blue; font-weight: bold">assert </span>type<span style="font-weight: bold">(</span>sides<span style="font-weight: bold">) == </span>int <span style="color: blue; font-weight: bold">and </span>sides <span style="font-weight: bold">&gt;= </span><span style="color: red">1</span><span style="font-weight: bold">, </span><span style="color: red">'Illegal value for sides'
+    </span><span style="color: blue; font-weight: bold">def </span>die<span style="font-weight: bold">():
+        </span><span style="color: blue; font-weight: bold">return </span>randint<span style="font-weight: bold">(</span><span style="color: red">1</span><span style="font-weight: bold">,</span>sides<span style="font-weight: bold">)
+    </span><span style="color: blue; font-weight: bold">return </span>die
+
+<span style="color: blue; font-weight: bold">def </span>make_test_die<span style="font-weight: bold">(*</span>outcomes<span style="font-weight: bold">):
+    </span><span style="color: darkred">"""Return a die that cycles deterministically through outcomes.
+
+    Note:  This function uses nonlocal variable assignment syntax and list
+           structures that have not yet been covered in the course.  Follow this
+           usage example, rather than trying to understand the implementation.
+
+    &gt;&gt;&gt; die = make_test_die(1, 2, 3)
+    &gt;&gt;&gt; die()
+    1
+    &gt;&gt;&gt; die()
+    2
+    &gt;&gt;&gt; die()
+    3
+    &gt;&gt;&gt; die()
+    1
+    &gt;&gt;&gt; die()
+    2
+    """
+    </span><span style="color: blue; font-weight: bold">assert </span>len<span style="font-weight: bold">(</span>outcomes<span style="font-weight: bold">) &gt; </span><span style="color: red">0</span><span style="font-weight: bold">, </span><span style="color: red">'You must supply outcomes to make_test_die'
+    </span><span style="color: blue; font-weight: bold">for </span>o <span style="color: blue; font-weight: bold">in </span>outcomes<span style="font-weight: bold">:
+        </span><span style="color: blue; font-weight: bold">assert </span>type<span style="font-weight: bold">(</span>o<span style="font-weight: bold">) == </span>int <span style="color: blue; font-weight: bold">and </span>o <span style="font-weight: bold">&gt;= </span><span style="color: red">1</span><span style="font-weight: bold">, </span><span style="color: red">'Outcome is not a positive integer'
+    </span>index <span style="font-weight: bold">= </span>len<span style="font-weight: bold">(</span>outcomes<span style="font-weight: bold">) - </span><span style="color: red">1
+    </span><span style="color: blue; font-weight: bold">def </span>die<span style="font-weight: bold">():
+        </span>nonlocal index
+        index <span style="font-weight: bold">= (</span>index <span style="font-weight: bold">+ </span><span style="color: red">1</span><span style="font-weight: bold">) % </span>len<span style="font-weight: bold">(</span>outcomes<span style="font-weight: bold">)
+        </span><span style="color: blue; font-weight: bold">return </span>outcomes<span style="font-weight: bold">[</span>index<span style="font-weight: bold">]
+    </span><span style="color: blue; font-weight: bold">return </span>die
+
+</pre>
+</body>
+</html>
