@@ -49,11 +49,11 @@ def hold(turn_total, outcome):
     (99, 0, True)
     """
     "*** YOUR CODE HERE ***"
-    if outcome==1:
-        return (turn_total,0,True)
-    else return (turn_total+outcome,0,False)
+    
+       
+    return (turn_total+outcome,0,True)
 
-def take_turn(plan, dice=make_fair_die(), who='Someone', comments=False):
+def take_turn(plan, dice=make_fair_die(), who='Someone', comments=True):
     """Simulate a single turn and return the points scored for the whole turn.
 
     Important: The d function should be called once, **and only once**, for
@@ -68,7 +68,10 @@ def take_turn(plan, dice=make_fair_die(), who='Someone', comments=False):
     """
     score_for_turn = 0  # Points scored in the whole turn
     "*** YOUR CODE HERE ***"
+    
     score_for_turn=plan(sore_for_turn)(sore_for_turn,dice()).get(0)
+    if comments=True:
+       print commentate.__doc__
     return score_for_turn
 
 def take_turn_test():
@@ -113,7 +116,13 @@ def describe_action(action):
     'took an illegal action!'
     """
     "*** YOUR CODE HERE ***"
-    return 'did something...'
+    if action.__name__=='roll':
+        return 'chose to roll'
+    if action.__name__=='hold':
+        return 'decided to hold'
+    else:
+        return 'took an inllegal action'
+    
  
 def draw_number(n, dot='*'):
     """Return an ascii art representation of rolling the number n.
@@ -126,7 +135,23 @@ def draw_number(n, dot='*'):
      -------
     """
     "*** YOUR CODE HERE ***"
-    return ''
+    a,b,c,d,e,f,g=('*'*7)
+    art_string=" "+"-"*7+"\n"+"|"+" "+a+"   "+b+" "+"|"+"\n"+"|"+" "+c+" "+d+\                 "  "+e+" "+"|"+"\n"+"|"+" "+f+"   "+g+" "+"|"+"\n"+" "+"-"*7+" "
+    if n==1:
+       b,c,d,e,f,g=(" "*6)
+    if n==2:
+       b,c,d,e,f=(" "*5)
+    if n==3:
+       b,c,e,f=(" "*4)
+    if n==4:
+       c,d,e=(" "*3)
+    if n=5:
+       c,e=(" "*2)
+    if n==6:
+       d=" "
+       
+
+    return art_string
 
 def draw_die(c, f, b, s, dot):
     """Return an ascii art representation of a die.
@@ -200,6 +225,14 @@ def make_roll_until_strategy(turn_goal):
     returns a plan (which is a function from turn totals to actions).
     """
     "*** YOUR CODE HERE ***"
+    def strategy(my_score,op_score):
+        def plan(turn_goal)
+            if turn >=turn_goal:
+                return hold
+            else:
+                return roll
+        return plan
+    return strategy 
 
 def make_roll_until_strategy_test():
     """Test that make_roll_until_strategy gives a strategy that returns correct
